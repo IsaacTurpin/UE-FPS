@@ -43,12 +43,15 @@ AShooterCharacter::AShooterCharacter()
 	
 	Combat = CreateDefaultSubobject<UCombatComponent>("Combat");
 	Combat->SetIsReplicated(true);
+	
+	DefaultFieldOfView = 110.0f;
 }
 
 void AShooterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	FirstPersonCamera->SetFieldOfView(DefaultFieldOfView);
 }
 
 void AShooterCharacter::BeginDestroy()
@@ -133,12 +136,12 @@ void AShooterCharacter::Input_FireWeapon_Released()
 void AShooterCharacter::Input_Aim_Pressed()
 {
 	Combat->Initiate_Aim_Pressed();
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, TEXT("Initiate_Aim_Pressed"), false);
+	OnAim(true);
 }
 
 void AShooterCharacter::Input_Aim_Released()
 {
 	Combat->Initiate_Aim_Released();
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, TEXT("Initiate_Aim_Released"), false);
+	OnAim(false);
 }
 

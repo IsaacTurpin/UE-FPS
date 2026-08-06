@@ -34,13 +34,14 @@ public:
 	void SpawnInventory();
 	void DestroyInventory();
 	
+	UPROPERTY(BlueprintReadOnly, Replicated)
+	bool bAiming;
+	
 protected:
 	UPROPERTY(Transient, BlueprintReadOnly, ReplicatedUsing = OnRep_CurrentWeapon)
 	TObjectPtr<AWeapon> CurrentWeapon;
 	
 private:
-	
-
 	
 	UFUNCTION()
 	void OnRep_CurrentWeapon(AWeapon* LastWeapon);
@@ -52,4 +53,9 @@ private:
 	TArray<TSubclassOf<AWeapon>> DefaultWeaponClasses;
 	
 	AWeapon* SpawnWeapon(TSubclassOf<AWeapon> WeaponClass) const;
+	
+	UFUNCTION(Server, Reliable)
+	void Server_Aim(bool bPressed);
+	
+	void Local_Aim(bool bPressed);
 };
