@@ -29,9 +29,11 @@ public:
 	virtual USkeletalMeshComponent* GetMesh1P_Implementation() const override;
 	virtual USkeletalMeshComponent* GetMesh3P_Implementation() const override;
 	/** ~PlayerInterface */
+	
+	virtual void BeginPlay() override;
+	virtual void BeginDestroy() override;
 
 protected:
-	virtual void BeginPlay() override;
 
 private:
 	
