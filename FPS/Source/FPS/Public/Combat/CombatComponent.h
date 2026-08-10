@@ -41,7 +41,10 @@ public:
 	TObjectPtr<AWeapon> CurrentWeapon;
 	
 protected:
-
+	
+	UPROPERTY(EditDefaultsOnly, Category = "FPS|Weapon")
+	float TraceLength;
+	
 	
 private:
 	
