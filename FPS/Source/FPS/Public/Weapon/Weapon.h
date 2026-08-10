@@ -8,6 +8,7 @@
 #include "Weapon.generated.h"
 
 class USkeletalMeshComponent;
+enum EPhysicalSurface : int;
 
 UCLASS()
 class FPS_API AWeapon : public AActor
@@ -33,18 +34,23 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "FPS|Trace")
 	float TraceRadius;
 	
+	void Local_Fire(const FVector& ImpactPoint, const FVector& ImpactNormal, TEnumAsByte<EPhysicalSurface> ImpactSurfaceType, bool bIsFirstPerson);
+	
 protected:
 	virtual void BeginPlay() override;
-
-private:
 	
+	UFUNCTION(BlueprintImplementableEvent)
+	void FireEffects(const FVector& ImpactPoint, const FVector& ImpactNormal, EPhysicalSurface ImpactSurfaceType, bool bIsFirstPerson);
+
 	// Weapon Mesh - First Person View
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FPS|Weapon")
 	TObjectPtr<USkeletalMeshComponent> Mesh1P;
 	
 	// Weapon Mesh - Third Person View
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FPS|Weapon")
 	TObjectPtr<USkeletalMeshComponent> Mesh3P;
+	
+private:
 	
 	void SetMeshVisibilities(APawn* OwningPawn) const;
 };
