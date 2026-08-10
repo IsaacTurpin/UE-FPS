@@ -33,6 +33,7 @@ AWeapon::AWeapon()
 	
 	AimFieldOfView = 80.0f;
 	TraceRadius = 5.f;
+	FireTime = 0.1f;
 	
 }
 
