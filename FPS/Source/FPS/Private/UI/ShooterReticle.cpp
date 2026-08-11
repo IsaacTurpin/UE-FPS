@@ -4,6 +4,7 @@
 #include "UI/ShooterReticle.h"
 
 #include "Character/ShooterCharacter.h"
+#include "Combat/CombatComponent.h"
 #include "Weapon/Weapon.h"
 
 void UShooterReticle::NativeOnInitialized()
@@ -19,7 +20,12 @@ void UShooterReticle::NativeOnInitialized()
 	
 	if (ShooterCharacter->HasWeaponFirstReplicated())
 	{
-		// Get Dynamic mat inst
+		AWeapon* Weapon = IPlayerInterface::Execute_GetCurrentWeapon(ShooterCharacter);
+		if (IsValid(Weapon))
+		{
+			OnReticleChanged(Weapon->GetReticleDynamicMaterialInstance());
+			OnAmmoCounterChanged(Weapon->GetAmmoCounterDynamicMaterialInstance(), Weapon->Ammo, Weapon->MagCapacity);
+		}
 	}
 	else
 	{
@@ -34,9 +40,33 @@ void UShooterReticle::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 
 void UShooterReticle::OnPossessedPawnChanged(APawn* OldPawn, APawn* NewPawn)
 {
-	
+	UCombatComponent* OldPawnCombat = UCombatComponent::FindCombatComponent(OldPawn);
+	if (IsValid(OldPawnCombat))
+	{
+		OldPawnCombat->OnReticleChanged.RemoveDynamic(this, &ThisClass::OnReticleChanged);
+		OldPawnCombat->OnAmmoCounterChanged.RemoveDynamic(this, &ThisClass::OnAmmoCounterChanged);
+	}
+	UCombatComponent* NewPawnCombat = UCombatComponent::FindCombatComponent(NewPawn);
+	if (IsValid(NewPawnCombat))
+	{
+		NewPawnCombat->OnReticleChanged.AddDynamic(this, &ThisClass::OnReticleChanged);
+		NewPawnCombat->OnAmmoCounterChanged.AddDynamic(this, &ThisClass::OnAmmoCounterChanged);
+	}
 }
 
 void UShooterReticle::OnWeaponFirstReplicated(AWeapon* Weapon)
 {
+	OnReticleChanged(Weapon->GetReticleDynamicMaterialInstance());
+	OnAmmoCounterChanged(Weapon->GetAmmoCounterDynamicMaterialInstance(), Weapon->Ammo, Weapon->MagCapacity);
+}
+
+void UShooterReticle::OnReticleChanged(UMaterialInstanceDynamic* ReticleDynMatInst)
+{
+	
+}
+
+void UShooterReticle::OnAmmoCounterChanged(UMaterialInstanceDynamic* AmmoCounterDynMatInst, int32 RoundsCurrent,
+	int32 RoundsMax)
+{
+	
 }

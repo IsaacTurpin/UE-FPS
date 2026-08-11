@@ -8,6 +8,8 @@
 #include "Weapon.generated.h"
 
 class USkeletalMeshComponent;
+class UMaterialInstanceDynamic;
+
 enum EPhysicalSurface : int;
 
 UENUM(BlueprintType)
@@ -28,6 +30,8 @@ public:
 	
 	USkeletalMeshComponent* GetMesh1P() const;
 	USkeletalMeshComponent* GetMesh3P() const;
+	UMaterialInstanceDynamic* GetReticleDynamicMaterialInstance();
+	UMaterialInstanceDynamic* GetAmmoCounterDynamicMaterialInstance();
 	
 	void AttachToOwningPawn() const;
 	void WeaponTrace(FHitResult& OutHit, float TraceLength);
@@ -80,4 +84,16 @@ private:
 	void SetMeshVisibilities(APawn* OwningPawn) const;
 	
 	int32 Sequence;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "FPS|Weapon")
+	TObjectPtr<UMaterialInterface> ReticleMaterial;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "FPS|Weapon")
+	TObjectPtr<UMaterialInterface> AmmoCounterMaterial;
+	
+	UPROPERTY()
+	TObjectPtr<UMaterialInstanceDynamic> DynMatInst_Reticle;
+	
+	UPROPERTY()
+	TObjectPtr<UMaterialInstanceDynamic> DynMatInst_AmmoCounter;
 };
