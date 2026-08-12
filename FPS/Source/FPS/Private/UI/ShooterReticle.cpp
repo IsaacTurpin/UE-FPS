@@ -9,9 +9,18 @@
 #include "Weapon/Weapon.h"
 #include "Materials/MaterialInstanceDynamic.h"
 
+namespace  Ammo
+{
+	const FName Rounds_Current = FName("Rounds_Current");
+	const FName Rounds_Max = FName("Rounds_Max");
+}
+
 void UShooterReticle::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
+	
+	Image_Reticle->SetRenderOpacity(0.f);
+	Image_AmmoCounter->SetRenderOpacity(0.f);
 	
 	GetOwningPlayer()->OnPossessedPawnChanged.AddDynamic(this, &ThisClass::OnPossessedPawnChanged);
 	
@@ -56,12 +65,16 @@ void UShooterReticle::OnPossessedPawnChanged(APawn* OldPawn, APawn* NewPawn)
 	{
 		OldPawnCombat->OnReticleChanged.RemoveDynamic(this, &ThisClass::OnReticleChanged);
 		OldPawnCombat->OnAmmoCounterChanged.RemoveDynamic(this, &ThisClass::OnAmmoCounterChanged);
+		OldPawnCombat->OnRoundFired.RemoveDynamic(this, &ThisClass::OnRoundFired);
 	}
 	UCombatComponent* NewPawnCombat = UCombatComponent::FindCombatComponent(NewPawn);
 	if (IsValid(NewPawnCombat))
 	{
+		Image_Reticle->SetRenderOpacity(1.f);
+		Image_AmmoCounter->SetRenderOpacity(1.f);
 		NewPawnCombat->OnReticleChanged.AddDynamic(this, &ThisClass::OnReticleChanged);
 		NewPawnCombat->OnAmmoCounterChanged.AddDynamic(this, &ThisClass::OnAmmoCounterChanged);
+		NewPawnCombat->OnRoundFired.AddDynamic(this, &ThisClass::OnRoundFired);
 	}
 }
 
@@ -87,10 +100,22 @@ void UShooterReticle::OnAmmoCounterChanged(UMaterialInstanceDynamic* AmmoCounter
 	int32 RoundsMax)
 {
 	CurrentAmmoCounter_DynMatInst = AmmoCounterDynMatInst;
+	CurrentAmmoCounter_DynMatInst->SetScalarParameterValue(Ammo::Rounds_Current, RoundsCurrent);
+	CurrentAmmoCounter_DynMatInst->SetScalarParameterValue(Ammo::Rounds_Max, RoundsMax);
+	
 	FSlateBrush Brush;
 	Brush.SetResourceObject(AmmoCounterDynMatInst);
 	if (IsValid(Image_AmmoCounter))
 	{
 		Image_AmmoCounter->SetBrush(Brush);
+	}
+}
+
+void UShooterReticle::OnRoundFired(int32 RoundsCurrent, int32 RoundsMax)
+{
+	if (CurrentAmmoCounter_DynMatInst.IsValid())
+	{
+		CurrentAmmoCounter_DynMatInst->SetScalarParameterValue(Ammo::Rounds_Current, RoundsCurrent);
+		CurrentAmmoCounter_DynMatInst->SetScalarParameterValue(Ammo::Rounds_Max, RoundsMax);
 	}
 }
