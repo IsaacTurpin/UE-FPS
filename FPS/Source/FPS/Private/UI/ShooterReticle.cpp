@@ -5,7 +5,9 @@
 
 #include "Character/ShooterCharacter.h"
 #include "Combat/CombatComponent.h"
+#include "Components/Image.h"
 #include "Weapon/Weapon.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 void UShooterReticle::NativeOnInitialized()
 {
@@ -30,6 +32,15 @@ void UShooterReticle::NativeOnInitialized()
 	else
 	{
 		ShooterCharacter->OnWeaponFirstReplicated.AddDynamic(this, &ThisClass::OnWeaponFirstReplicated);
+	}
+	
+	if (ShooterCharacter->HasAuthority())
+	{
+		AWeapon* Weapon = IPlayerInterface::Execute_GetCurrentWeapon(ShooterCharacter);
+		if (!IsValid(Weapon)) return;
+
+		OnReticleChanged(Weapon->GetReticleDynamicMaterialInstance());
+		OnAmmoCounterChanged(Weapon->GetAmmoCounterDynamicMaterialInstance(), Weapon->Ammo, Weapon->MagCapacity);
 	}
 }
 
@@ -62,11 +73,24 @@ void UShooterReticle::OnWeaponFirstReplicated(AWeapon* Weapon)
 
 void UShooterReticle::OnReticleChanged(UMaterialInstanceDynamic* ReticleDynMatInst)
 {
+	CurrentReticle_DynMatInst = ReticleDynMatInst;
 	
+	FSlateBrush Brush;
+	Brush.SetResourceObject(ReticleDynMatInst);
+	if (IsValid(Image_Reticle))
+	{
+		Image_Reticle->SetBrush(Brush);
+	}
 }
 
 void UShooterReticle::OnAmmoCounterChanged(UMaterialInstanceDynamic* AmmoCounterDynMatInst, int32 RoundsCurrent,
 	int32 RoundsMax)
 {
-	
+	CurrentAmmoCounter_DynMatInst = AmmoCounterDynMatInst;
+	FSlateBrush Brush;
+	Brush.SetResourceObject(AmmoCounterDynMatInst);
+	if (IsValid(Image_AmmoCounter))
+	{
+		Image_AmmoCounter->SetBrush(Brush);
+	}
 }

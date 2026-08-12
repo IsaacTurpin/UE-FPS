@@ -196,6 +196,16 @@ void AShooterCharacter::PossessedBy(AController* NewController)
 	}
 }
 
+void AShooterCharacter::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+	
+	if (IsValid(Combat))
+	{
+		Combat->InitialiseWeaponWidgets();
+	}
+}
+
 FName AShooterCharacter::GetWeaponAttachPoint_Implementation(const FGameplayTag& WeaponType) const
 {
 	checkf(Combat->WeaponData, TEXT("No Weapon Data Asset - Please fill out BP_ShooterCharacter"));
