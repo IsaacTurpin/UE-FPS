@@ -52,6 +52,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "FPS|Reticle")
 	FReticleParams ReticleParams;
 	
+	UPROPERTY(EditDefaultsOnly, Category = "FPS|Icon")
+	TObjectPtr<UMaterialInterface> WeaponIcon;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FPS|FireType")
 	float FireTime;
 	
