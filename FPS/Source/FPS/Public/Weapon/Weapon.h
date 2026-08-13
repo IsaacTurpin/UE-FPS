@@ -20,6 +20,16 @@ enum class EFireType : uint8
 	SemiAuto UMETA(DisplayName = "SemiAutomatic")
 };
 
+UENUM(BlueprintType)
+enum class EWeaponStatus : uint8
+{
+	Idle,
+	Firing,
+	Reloading,
+	Cycling,
+	Unequipped
+};
+
 UCLASS()
 class FPS_API AWeapon : public AActor
 {
@@ -71,6 +81,8 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category = "FPS|Ammo")
 	int32 StartingCarriedAmmo;
+	
+	EWeaponStatus WeaponStatus;
 	
 protected:
 	virtual void BeginPlay() override;
