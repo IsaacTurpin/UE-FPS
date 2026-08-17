@@ -39,6 +39,8 @@ public:
 	void Initiate_Aim_Pressed();
 	void Initiate_Aim_Released();
 	
+	void Notify_CycleWeapon();
+	
 	UPROPERTY(BlueprintAssignable)
 	FReticleChanged OnReticleChanged;
 	
@@ -82,6 +84,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "FPS|Weapon")
 	float TraceLength;
 	
+	UFUNCTION()
+	void BlendOut_CycleWeapon(UAnimMontage* Montage, bool bInterrupted);
 	
 private:
 	
@@ -119,9 +123,7 @@ private:
 	void Local_FireWeapon();
 	
 	int32 AdvanceWeaponIndex();
-	
 	int32 Local_WeaponIndex;
-	
 	void Local_CycleWeapon(int32 WeaponIndex);
 	
 	UFUNCTION(Server, Reliable)
