@@ -128,13 +128,13 @@ void UCombatComponent::Multicast_CycleWeapon_Implementation(int32 WeaponIndex)
 
 void UCombatComponent::Notify_CycleWeapon()
 {
-	GEngine->AddOnScreenDebugMessage(
-		-1,
-		5.f,
-		FColor::Cyan,
-		TEXT("Notify_CycleWeapon)"),
-		false
-		);
+	if (!IsValid(CurrentWeapon)) return;
+	
+	AWeapon* NewWeapon = Inventory[Local_WeaponIndex];
+	if (IsValid(NewWeapon))
+	{
+		EquipWeapon(NewWeapon);
+	}
 }
 
 void UCombatComponent::BlendOut_CycleWeapon(UAnimMontage* Montage, bool bInterrupted)
@@ -295,6 +295,54 @@ void UCombatComponent::Equip(AWeapon* Weapon)
 	OnCurrentReserveAmmoChanged.Broadcast(CurrentReserveAmmo, Weapon->Ammo, CurrentWeapon->WeaponIcon);
 }
 
+void UCombatComponent::EquipWeapon(AWeapon* Weapon)
+{
+	if (!IsValid(Weapon) || !IsValid(GetOwner())) return;
+	
+	if (GetOwner()->GetLocalRole() == ROLE_Authority)
+	{
+		SetCurrentWeapon(Weapon, CurrentWeapon);
+	}
+	else
+	{
+		Server_EquipWeapon(Weapon);
+	}
+}
+
+void UCombatComponent::Server_EquipWeapon_Implementation(AWeapon* Weapon)
+{
+	EquipWeapon(Weapon);
+}
+
+void UCombatComponent::SetCurrentWeapon(AWeapon* NewWeapon, AWeapon* LastWeapon)
+{
+	AWeapon* LocalLastWeapon = nullptr;
+	
+	if (IsValid(LastWeapon))
+	{
+		LocalLastWeapon = LastWeapon;
+	}
+	else if (NewWeapon != CurrentWeapon)
+	{
+		LocalLastWeapon = CurrentWeapon;
+	}
+	
+	if (IsValid(LocalLastWeapon))
+	{
+		LocalLastWeapon->DetachFromOwningPawn();
+		LocalLastWeapon->WeaponStatus = EWeaponStatus::Unequipped;
+	}
+	
+	CurrentWeapon = NewWeapon;
+	APawn* OwningPawn = Cast<APawn>(GetOwner());
+	if (IsValid(OwningPawn) && OwningPawn->HasAuthority() && IsValid(CurrentWeapon))
+	{
+		CurrentReserveAmmo = ReserveAmmo.FindChecked(CurrentWeapon->WeaponType);
+	}
+	
+	CurrentWeapon->AttachToOwningPawn(OwningPawn);
+}
+
 void UCombatComponent::SpawnInventory()
 {
 	if (GetOwner()->GetLocalRole() < ROLE_Authority) return;
@@ -336,8 +384,8 @@ void UCombatComponent::InitialiseWeaponWidgets() const
 
 void UCombatComponent::OnRep_CurrentWeapon(AWeapon* LastWeapon)
 {
-	if (!IsValid(CurrentWeapon)) return;
-	CurrentWeapon->AttachToOwningPawn(Cast<APawn>(GetOwner()));
+	SetCurrentWeapon(CurrentWeapon, LastWeapon);
+	
 	IPlayerInterface::Execute_WeaponReplicated(GetOwner());
 	InitialiseWeaponWidgets();
 }
