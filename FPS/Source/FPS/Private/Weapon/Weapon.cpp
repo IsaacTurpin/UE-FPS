@@ -145,7 +145,10 @@ void AWeapon::Local_Fire(const FVector& ImpactPoint, const FVector& ImpactNormal
 	if (GetInstigator()->IsLocallyControlled())
 	{
 		Ammo = FMath::Clamp(Ammo -1, 0, MagCapacity);
-		++Sequence;
+		if (!GetInstigator()->HasAuthority())
+		{
+			++Sequence;
+		}
 	}
 	
 }
@@ -157,7 +160,7 @@ void AWeapon::Auth_Fire()
 
 void AWeapon::Rep_Fire(int32 AuthAmmo)
 {
-	if (GetInstigator()->IsLocallyControlled())
+	if (GetInstigator()->IsLocallyControlled() && !GetInstigator()->HasAuthority())
 	{
 		Ammo = AuthAmmo;
 		--Sequence;
