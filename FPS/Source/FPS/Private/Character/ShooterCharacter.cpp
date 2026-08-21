@@ -17,6 +17,7 @@
 #include "Player/ShooterPlayerController.h"
 #include "Weapon/Weapon.h"
 #include "TimerManager.h"
+#include "Elimination/EliminationComponent.h"
 #include "Game/ShooterGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -53,6 +54,9 @@ AShooterCharacter::AShooterCharacter()
 	Combat = CreateDefaultSubobject<UCombatComponent>("Combat");
 	Combat->SetIsReplicated(true);
 	
+	Elimination = CreateDefaultSubobject<UEliminationComponent>("Elimination");
+	Elimination->SetIsReplicated(false);
+	
 	Health = CreateDefaultSubobject<UHealthComponent>("Health");
 	Health->SetIsReplicated(true);
 	
@@ -76,6 +80,10 @@ void AShooterCharacter::BeginPlay()
 		PC->bPawnAlive = true;
 	}
 	
+	if (HasAuthority())
+	{
+		Combat->OnRoundReported.AddDynamic(Elimination, &UEliminationComponent::OnRoundReported);
+	}
 }
 
 void AShooterCharacter::BeginDestroy()
@@ -282,8 +290,10 @@ bool AShooterCharacter::DoDamage_Implementation(float DamageAmount, AActor* Dama
 {
 	if (!IsValid(Health)) return false;
 	
-	Health->ChangeHealthByAmount(-DamageAmount, DamageInstigator);
-	// Lethal?
+	if (Health->ChangeHealthByAmount(-DamageAmount, DamageInstigator))
+	{
+		return true; // true if lethal
+	}
 	
 	const int32 MontageSelection = FMath::RandRange(0, HitReacts.Num() - 1);
 	Multicast_HitReact(MontageSelection);

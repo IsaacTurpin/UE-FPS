@@ -38,6 +38,7 @@ bool UHealthComponent::ChangeHealthByAmount(float Amount, AActor* Instigator)
 	if (Health <= 0.f)
 	{
 		StartDeath();
+		return true;
 	}
 	
 	return false;
