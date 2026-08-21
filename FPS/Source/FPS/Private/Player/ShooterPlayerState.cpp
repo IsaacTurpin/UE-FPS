@@ -1,0 +1,100 @@
+﻿// Copyright Isaac Turpin
+
+
+#include "Player/ShooterPlayerState.h"
+
+AShooterPlayerState::AShooterPlayerState()
+{
+	SetNetUpdateFrequency(100.f);
+	
+	ScoredElims = 0;
+	Defeats = 0;
+	Hits = 0;
+	Misses = 0;
+	bOnStreak = false;
+	HeadShotElims = 0;
+	HighestStreak = 0;
+	RevengeElims = 0;
+	DethroneElims = 0;
+	ShowStopperElims = 0;
+	bFirstBlood = false;
+	bWinner = false;
+}
+
+void AShooterPlayerState::AddScoredElim()
+{
+	++ScoredElims;
+}
+
+void AShooterPlayerState::AddDefeat()
+{
+	++Defeats;
+}
+
+void AShooterPlayerState::AddHit()
+{
+	++Hits;
+}
+
+void AShooterPlayerState::AddMiss()
+{
+	++Misses;
+}
+
+void AShooterPlayerState::AddHeadshotElim()
+{
+	++HeadShotElims;
+}
+
+void AShooterPlayerState::AddSequentialElim(int32 SequenceCount)
+{
+	if (SequentialElims.Contains(SequenceCount))
+	{
+		SequentialElims[SequenceCount]++;
+	}
+	else
+	{
+		SequentialElims.Add(SequenceCount, 1);
+	}
+	
+	for (auto& Elim : SequentialElims)
+	{
+		if (Elim.Key < SequenceCount && Elim.Value > 0)
+		{
+			Elim.Value--;
+		}
+	}
+}
+
+void AShooterPlayerState::UpdateHighestStreak(int32 StreakCount)
+{
+	if (StreakCount > HighestStreak)
+	{
+		HighestStreak = StreakCount;
+	}
+}
+
+void AShooterPlayerState::AddRevengeElim()
+{
+	++RevengeElims;
+}
+
+void AShooterPlayerState::AddDethroneElim()
+{
+	++DethroneElims;
+}
+
+void AShooterPlayerState::AddShowStopperElim()
+{
+	++ShowStopperElims;
+}
+
+void AShooterPlayerState::GotFirstBlood()
+{
+	bFirstBlood = true;
+}
+
+void AShooterPlayerState::IsNowWinner()
+{
+	bWinner = true;
+}
