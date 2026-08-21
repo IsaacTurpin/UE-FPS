@@ -55,8 +55,8 @@ void UEliminationComponent::ProcessElimination(bool bHeadShot, AShooterPlayerSta
 	if (IsValid(GameState))
 	{
 		HandleFirstBlood(GameState, SpecialElimType, AttackerPS);
+		UpdateLeaderStatus(GameState, SpecialElimType, AttackerPS, VictimPS);
 	}
-	// headshots and more
 }
 
 void UEliminationComponent::ProcessHeadshot(bool bHeadShot, ESpecialElimType& OutElimType,
@@ -123,6 +123,33 @@ void UEliminationComponent::HandleFirstBlood(AShooterGameStateBase* GameState, E
 	{
 		OutElimType |= ESpecialElimType::FirstBlood;
 		AttackerPS->GotFirstBlood();
+	}
+}
+
+void UEliminationComponent::UpdateLeaderStatus(AShooterGameStateBase* GameState, ESpecialElimType& OutElimType,
+	AShooterPlayerState* AttackerPS, AShooterPlayerState* VictimPS)
+{
+	AShooterPlayerState* LastLeader = GameState->GetSoleLeader();
+	const bool bAttackerWasTiedForTheLead = GameState->IsTiedForTheLead(AttackerPS);
+	GameState->UpdateLeader();
+	if (!bAttackerWasTiedForTheLead && GameState->IsTiedForTheLead(AttackerPS))
+	{
+		OutElimType |= ESpecialElimType::TiedTheLeader;
+	}
+	if (IsValid(LastLeader) && LastLeader != GameState->GetSoleLeader())
+	{
+		LastLeader->Client_LostTheLead();
+		
+		if (VictimPS == LastLeader)
+		{
+			OutElimType |= ESpecialElimType::Dethrone;
+			AttackerPS->AddDethroneElim();
+		}
+	}
+	
+	if (AttackerPS != LastLeader && AttackerPS == GameState->GetSoleLeader())
+	{
+		OutElimType |= ESpecialElimType::GainedTheLead;
 	}
 }
 
