@@ -13,6 +13,8 @@ class USpecialElim;
 class USpecialElimData;
 enum class ESpecialElimType : uint16;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FScoreChanged, int32, NewScore);
+
 UCLASS()
 class FPS_API AShooterPlayerState : public APlayerState
 {
@@ -21,6 +23,9 @@ class FPS_API AShooterPlayerState : public APlayerState
 public:
 	
 	AShooterPlayerState();
+	
+	UPROPERTY(BlueprintAssignable)
+	FScoreChanged OnScoreChanged;
 	
 	void AddScoredElim();
 	void AddDefeat();
