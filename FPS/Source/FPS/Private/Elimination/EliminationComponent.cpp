@@ -57,6 +57,15 @@ void UEliminationComponent::ProcessElimination(bool bHeadShot, AShooterPlayerSta
 		HandleFirstBlood(GameState, SpecialElimType, AttackerPS);
 		UpdateLeaderStatus(GameState, SpecialElimType, AttackerPS, VictimPS);
 	}
+	
+	if (HasSpecialElimTypes(SpecialElimType))
+	{
+		AttackerPS->Client_SpecialElim(SpecialElimType, SequentialElims, Streak, AttackerPS->GetScoredElims());
+	}
+	else
+	{
+		AttackerPS->Client_ScoredElim(AttackerPS->GetScoredElims());
+	}
 }
 
 void UEliminationComponent::ProcessHeadshot(bool bHeadShot, ESpecialElimType& OutElimType,
@@ -151,6 +160,11 @@ void UEliminationComponent::UpdateLeaderStatus(AShooterGameStateBase* GameState,
 	{
 		OutElimType |= ESpecialElimType::GainedTheLead;
 	}
+}
+
+bool UEliminationComponent::HasSpecialElimTypes(const ESpecialElimType& SpecialElimType) const
+{
+	return static_cast<uint16>(SpecialElimType) != 0;
 }
 
 void UEliminationComponent::ProcessHitOrMiss(bool bHit, AShooterPlayerState* AttackerPS)
