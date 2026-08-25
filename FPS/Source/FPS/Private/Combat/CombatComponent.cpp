@@ -297,11 +297,10 @@ void UCombatComponent::Server_FireWeapon_Implementation(const FHitResult& Hit)
 	const bool bHeadShot = Hit.BoneName == "head";
 	bool bLethal = false;
 	
-	// TODO: Broadcast
-	
 	if (bHit)
 	{
-		bLethal = IPlayerInterface::Execute_DoDamage(Hit.GetActor(), CurrentWeapon->Damage, GetOwner());
+		float DamageToDo = bHeadShot ? CurrentWeapon->Damage * CurrentWeapon->HeadshotDamageMultiplier : CurrentWeapon->Damage;
+		bLethal = IPlayerInterface::Execute_DoDamage(Hit.GetActor(), DamageToDo, GetOwner());
 	}
 	
 	OnRoundReported.Broadcast(GetOwner(), Hit.GetActor(), bHit, bHeadShot, bLethal);
