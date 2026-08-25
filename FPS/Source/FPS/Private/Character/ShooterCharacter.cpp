@@ -358,25 +358,21 @@ void AShooterCharacter::DeathTimerFinished()
 void AShooterCharacter::Input_CycleWeapon()
 {
 	Combat->Initiate_CycleWeapon();
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, TEXT("Initiate_CycleWeapon"), false);
 }
 
 void AShooterCharacter::Input_ReloadWeapon()
 {
 	Combat->Initiate_ReloadWeapon();
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, TEXT("Initiate_ReloadWeapon"), false);
 }
 
 void AShooterCharacter::Input_FireWeapon_Pressed()
 {
 	Combat->Initiate_FireWeapon_Pressed();
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, TEXT("Initiate_FireWeapon_Pressed"), false);
 }
 
 void AShooterCharacter::Input_FireWeapon_Released()
 {
 	Combat->Initiate_FireWeapon_Released();
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, TEXT("Initiate_FireWeapon_Released"), false);
 }
 
 void AShooterCharacter::Input_Aim_Pressed()
